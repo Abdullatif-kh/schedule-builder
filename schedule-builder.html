@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بناء الجدول - مولد الجداول الذكي</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+    </div>
+
+    <!-- Main Container -->
+    <div class="schedule-container">
+        <!-- Header with back button -->
+        <div class="schedule-header glass-card">
+            <div class="header-top">
+                <button class="btn-back" onclick="window.location.href='index.html'" title="العودة للصفحة الرئيسية">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span>العودة</span>
+                </button>
+                <div class="hero-content">
+                    <h1>بناء الجدول الدراسي</h1>
+                    <p>خصص جدولك الدراسي حسب تفضيلاتك واحصل على أفضل الخيارات</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <!-- Course Selection Card -->
+            <div class="control-card glass-card">
+                <h3 class="control-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    اختيار المواد
+                </h3>
+                
+                <div class="form-group">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button type="button" class="btn btn-secondary" id="selectAllBtn" style="flex: 1;">
+                            تحديد الكل
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="deselectAllBtn" style="flex: 1;">
+                            إلغاء التحديد
+                        </button>
+                    </div>
+                    
+                    <div class="courses-list" id="coursesList">
+                        <!-- Courses will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Card -->
+            <div class="control-card glass-card">
+                <h3 class="control-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m0-6h6M6 12H1"></path>
+                    </svg>
+                    إعدادات الجدول
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">نطاق الساعات المعتمدة</label>
+                    <div class="range-container">
+                        <input type="number" id="minCredits" class="form-input" value="12" min="1" max="30" placeholder="من">
+                        <span class="range-separator">←</span>
+                        <input type="number" id="maxCredits" class="form-input" value="20" min="1" max="30" placeholder="إلى">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">الحد الأقصى للنتائج</label>
+                    <select id="maxResults" class="form-select">
+                        <option value="100">100 جدول (سريع)</option>
+                        <option value="500">500 جدول (متوسط)</option>
+                        <option value="1000" selected>1000 جدول (شامل)</option>
+                        <option value="2000">2000 جدول (شامل جداً)</option>
+                        <option value="0">بلا حدود (بطيء)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="includeClosedSections" checked>
+                        <label class="checkbox-label" for="includeClosedSections">تضمين الشعب المغلقة</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="allowPartialSchedules" checked>
+                        <label class="checkbox-label" for="allowPartialSchedules">السماح بالجداول الجزئية</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Days Selection Card -->
+            <div class="control-card glass-card">
+                <h3 class="control-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    اختيار أيام الدوام
+                </h3>
+                
+                <div class="days-grid">
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="day_1" value="1" checked>
+                        <label for="day_1">الأحد</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="day_2" value="2" checked>
+                        <label for="day_2">الاثنين</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="day_3" value="3" checked>
+                        <label for="day_3">الثلاثاء</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="day_4" value="4" checked>
+                        <label for="day_4">الأربعاء</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="day_5" value="5" checked>
+                        <label for="day_5">الخميس</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registered Sections Card -->
+            <div class="control-card glass-card">
+                <h3 class="control-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    الشعب المسجلة مسبقاً
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">أدخل أرقام الشعب (مفصولة بفواصل)</label>
+                    <textarea id="registeredSectionsInput" class="form-textarea" rows="3" 
+                        placeholder="مثال: 3014, 3021, 4061"></textarea>
+                    <p style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 8px;">
+                        الشعب المسجلة تحصل على أولوية عالية وتظهر حتى لو كانت مغلقة
+                    </p>
+                    <div id="registeredSectionsDisplay" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="btn btn-primary btn-large btn-generate" id="generateBtn">
+            <svg class="btn-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            <span>توليد الجداول</span>
+        </button>
+
+        <!-- Loading State -->
+        <div class="loading glass-card" id="loadingState" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">جارٍ توليد الجداول...</p>
+            <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); margin-top: 10px;">
+                قد يستغرق الأمر بضع ثوانٍ
+            </p>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header glass-card">
+                <h2 class="results-title">النتائج</h2>
+                <div class="results-count" id="resultsCount">0 جدول</div>
+            </div>
+            
+            <div class="schedules-grid" id="schedulesGrid">
+                <!-- Schedules will be populated here -->
+            </div>
+        </div>
+
+        <!-- Footer removed - back button is now in header -->
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <script src="schedule-script.js"></script>
+    <script src="export-schedule.js"></script>
+</body>
+</html>

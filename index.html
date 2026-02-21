@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد الجداول الذكي - الجامعة الإسلامية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+    </div>
+
+    <!-- Main Container -->
+    <div class="landing-container">
+        <!-- Hero Section -->
+        <div class="hero-section glass-card">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span>أداة احترافية لتنظيم الجداول</span>
+                </div>
+                <h1 class="hero-title">
+                    مولد الجداول الذكي
+                    <span class="hero-subtitle">الجامعة الإسلامية</span>
+                </h1>
+                <p class="hero-description">
+                    أنشئ جدولك الدراسي المثالي بذكاء اصطناعي متقدم
+                    <br>
+                    احصل على أفضل جدول يناسب احتياجاتك الأكاديمية
+                </p>
+            </div>
+        </div>
+
+        <!-- Steps Grid -->
+        <div class="steps-grid">
+            <!-- Step 1: Extract Data -->
+            <div class="step-card glass-card" data-step="1">
+                <div class="step-number">
+                    <span>1</span>
+                </div>
+                <div class="step-content">
+                    <h3 class="step-title">استخرج بيانات المواد</h3>
+                    <p class="step-description">
+                        استخدم السكربت المتقدم لسحب المواد المطروحة من النظام الأكاديمي بشكل تلقائي
+                    </p>
+                    
+                    <div class="script-actions">
+                        <button class="btn btn-primary" id="copyScriptBtn">
+                            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            نسخ السكربت
+                        </button>
+                        <button class="btn btn-secondary" id="downloadScriptBtn">
+                            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            تحميل السكربت
+                        </button>
+                    </div>
+
+                    <div class="instructions-box">
+                        <h4 class="instructions-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            طريقة الاستخدام:
+                        </h4>
+                        <ol class="instructions-list">
+                            <li>انتقل إلى موقع الجامعة ← النظام الأكاديمي</li>
+                            <li>اختر: التسجيل الإلكتروني ← المقررات المطروحة وفق الخطة</li>
+                            <li>اضغط <kbd>F12</kbd> لفتح أدوات المطور</li>
+                            <li>انتقل إلى تبويب <strong>Console</strong></li>
+                            <li>الصق السكربت واضغط <kbd>Enter</kbd></li>
+                            <li>انتظر حتى يكتمل التحميل (سيُحفظ ملف JSON تلقائياً)</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Upload File -->
+            <div class="step-card glass-card" data-step="2">
+                <div class="step-number">
+                    <span>2</span>
+                </div>
+                <div class="step-content">
+                    <h3 class="step-title">ارفع ملف المواد</h3>
+                    <p class="step-description">
+                        قم برفع ملف JSON الذي تم إنشاؤه من السكربت
+                    </p>
+                    
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" id="fileInput" accept=".json" hidden>
+                        <div class="upload-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <p class="upload-text">
+                            <strong>اسحب الملف هنا</strong> أو انقر للتصفح
+                        </p>
+                        <p class="upload-hint">JSON فقط</p>
+                    </div>
+
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <div class="file-details">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                <polyline points="13 2 13 9 20 9"></polyline>
+                            </svg>
+                            <div class="file-text">
+                                <p class="file-name" id="fileName"></p>
+                                <p class="file-size" id="fileSize"></p>
+                            </div>
+                        </div>
+                        <button class="btn-remove" id="removeFileBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Generate Schedule -->
+            <div class="step-card glass-card" data-step="3">
+                <div class="step-number">
+                    <span>3</span>
+                </div>
+                <div class="step-content">
+                    <h3 class="step-title">اصنع جدولك المثالي</h3>
+                    <p class="step-description">
+                        اختر تفضيلاتك واحصل على أفضل الجداول الممكنة
+                    </p>
+                    
+                    <div class="features-list">
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>توليد جداول متعددة تلقائياً</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>تجنب التعارضات الزمنية</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>تقليل الفراغات بين المحاضرات</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>تفضيل الشعب المفتوحة</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>خيارات مرنة للتخصيص</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>عرض احصائيات تفصيلية</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-large btn-generate" id="generateBtn" disabled>
+                        <svg class="btn-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                        </svg>
+                        ابدأ بناء الجدول
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content glass-card">
+                <p>
+                    أداة مطورة لطلاب الجامعة الإسلامية
+                </p>
+                <p class="footer-note">
+                    أداة مستقلة - غير تابعة رسمياً للجامعة
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <!-- Script Modal -->
+    <div class="modal" id="scriptModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3 class="modal-title">سكربت سحب المواد المطروحة</h3>
+                <button class="modal-close" id="modalCloseBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="code-container">
+                    <pre id="scriptCode"></pre>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="modalCopyBtn">
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        نسخ السكربت
+                    </button>
+                    <button class="btn btn-secondary" id="modalDownloadBtn">
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        تحميل السكربت
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="landing-script.js"></script>
+</body>
+</html>
