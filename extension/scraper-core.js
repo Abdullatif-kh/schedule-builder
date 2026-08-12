@@ -1,3 +1,10 @@
+// ===============================================
+// GENERATED FILE - DO NOT EDIT
+// Source: university-courses-scraper.js
+// Regenerate with: node tools/sync-scraper.js
+// ===============================================
+
+(function () {
 // سكريبت المواد الجامعية - محدث ليدعم الأيام المتعددة
 class UniversityCoursesScraper {
   constructor() {
@@ -605,22 +612,5 @@ class UniversityCoursesScraper {
   }
 }
 
-// تشغيل السكريبت المحدث
-console.log('🕌 سكريبت الجامعة الإسلامية المحدث');
-console.log('🆕 يدعم الآن الأيام المتعددة (مثل: "4 1" = الأحد والأربعاء)');
-
-const scraper = new UniversityCoursesScraper();
-
-console.log('\n📋 الخيارات:');
-console.log('🚀 scraper.enableFastMode().scrapeCurrentPage() - تشغيل بالوضع السريع');
-console.log('⚡ scraper.enableTurboMode().scrapeCurrentPage() - فائق السرعة');
-
-console.log('\n🆕 التحديثات الجديدة:');
-console.log('✅ يدعم الأيام المتعددة: "4 1", "41", "4,1"');
-console.log('✅ ينشئ جلسة منفصلة لكل يوم');
-console.log('✅ يتعامل مع الفراغات والفواصل');
-
-setTimeout(() => {
-  console.log('\n🚀 بدء التشغيل التلقائي بالوضع السريع...');
-  scraper.enableFastMode().scrapeCurrentPage();
-}, 3000);
+    globalThis.UniversityCoursesScraper = UniversityCoursesScraper;
+})();
