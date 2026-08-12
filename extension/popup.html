@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>سحب المواد المطروحة</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <header class="header">
+        <img src="icons/icon48.png" alt="" width="32" height="32">
+        <div>
+            <h1>سحب المواد المطروحة</h1>
+            <p class="subtitle">مولد الجداول الذكي</p>
+        </div>
+    </header>
+
+    <main class="body">
+        <p class="hint" id="hint">
+            افتح صفحة <strong>المقررات المطروحة وفق الخطة</strong> في النظام الأكاديمي، ثم اضغط "ابدأ السحب".
+        </p>
+
+        <label class="field">
+            <span class="field-label">سرعة السحب</span>
+            <select id="speed">
+                <option value="fast" selected>سريع (موصى به)</option>
+                <option value="turbo">فائق السرعة</option>
+                <option value="safe">آمن (أبطأ وأدق)</option>
+            </select>
+        </label>
+
+        <div class="progress" id="progress" hidden>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <p class="progress-text" id="progressText"></p>
+        </div>
+
+        <p class="status" id="status" hidden></p>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="startBtn">ابدأ السحب</button>
+            <button class="btn btn-danger" id="cancelBtn" hidden>إيقاف</button>
+            <button class="btn btn-secondary" id="openBtn" hidden>افتح الموقع بالبيانات</button>
+            <button class="btn btn-ghost" id="clearBtn" hidden>مسح البيانات المحفوظة</button>
+        </div>
+    </main>
+
+    <script src="shared.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>

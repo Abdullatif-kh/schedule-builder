@@ -103,6 +103,16 @@
                         <label class="checkbox-label" for="allowPartialSchedules">السماح بالجداول الجزئية</label>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="hideIdenticalTimes" checked>
+                        <label class="checkbox-label" for="hideIdenticalTimes">إخفاء الجداول المتطابقة في الأوقات</label>
+                    </div>
+                    <p class="form-hint">
+                        الجداول التي لها نفس المواد والأوقات تماماً وتختلف فقط في أرقام الشعب تُعرض مرة واحدة
+                    </p>
+                </div>
             </div>
 
             <!-- Days Selection Card -->
@@ -138,6 +148,42 @@
                         <input type="checkbox" id="day_5" value="5" checked>
                         <label for="day_5">الخميس</label>
                     </div>
+                </div>
+            </div>
+
+            <!-- Preferred Instructors Card -->
+            <div class="control-card glass-card">
+                <h3 class="control-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    الدكاترة المفضلون
+                </h3>
+
+                <div class="form-group">
+                    <input type="text" id="instructorSearch" class="form-input" placeholder="ابحث عن اسم الدكتور...">
+                </div>
+
+                <div class="form-group">
+                    <div class="courses-list" id="instructorsList">
+                        <!-- Instructors will be populated here -->
+                    </div>
+                    <div id="instructorsEmptyState" class="form-hint" style="display: none;">
+                        لا يوجد دكتور بهذا الاسم
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="strictInstructors">
+                        <label class="checkbox-label" for="strictInstructors">إلزامي: استبعد شعب غير المفضلين</label>
+                    </div>
+                    <p class="form-hint">
+                        بدون تفعيله تحصل الجداول التي فيها دكاترة مفضلون على أولوية أعلى فقط.
+                        مع تفعيله تُستبعد الشعب الأخرى للمواد التي يدرّسها دكتور مفضل.
+                    </p>
+                    <div id="preferredInstructorsDisplay" style="margin-top: 10px;"></div>
                 </div>
             </div>
 
@@ -184,11 +230,24 @@
         <div class="results-section" id="resultsSection" style="display: none;">
             <div class="results-header glass-card">
                 <h2 class="results-title">النتائج</h2>
-                <div class="results-count" id="resultsCount">0 جدول</div>
+                <div class="results-tools">
+                    <label class="form-label" for="sortMode">ترتيب حسب</label>
+                    <select id="sortMode" class="form-select">
+                        <option value="score" selected>الأفضل (النقاط)</option>
+                        <option value="days">أقل أيام دوام</option>
+                        <option value="gaps">أقل فراغات</option>
+                    </select>
+                    <div class="results-count" id="resultsCount">0 جدول</div>
+                </div>
             </div>
-            
+
             <div class="schedules-grid" id="schedulesGrid">
                 <!-- Schedules will be populated here -->
+            </div>
+
+            <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+                <button class="btn btn-secondary" id="loadMoreBtn">عرض المزيد</button>
+                <p class="form-hint" id="loadMoreHint"></p>
             </div>
         </div>
 
