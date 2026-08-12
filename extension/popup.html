@@ -25,6 +25,7 @@
                 <option value="fast" selected>سريع (موصى به)</option>
                 <option value="turbo">فائق السرعة</option>
                 <option value="safe">آمن (أبطأ وأدق)</option>
+                <option value="gentle">بطيء جداً (للأنظمة الثقيلة)</option>
             </select>
         </label>
 
@@ -39,7 +40,14 @@
             <button class="btn btn-primary" id="startBtn">ابدأ السحب</button>
             <button class="btn btn-danger" id="cancelBtn" hidden>إيقاف</button>
             <button class="btn btn-secondary" id="openBtn" hidden>افتح الموقع بالبيانات</button>
+            <button class="btn btn-secondary" id="inspectBtn">فحص الصفحة</button>
             <button class="btn btn-ghost" id="clearBtn" hidden>مسح البيانات المحفوظة</button>
+        </div>
+
+        <div class="report" id="report" hidden>
+            <p class="field-label">تقرير الفحص (لا يضغط أي زر في الصفحة)</p>
+            <textarea id="reportText" readonly rows="8"></textarea>
+            <button class="btn btn-secondary" id="copyReportBtn">نسخ التقرير</button>
         </div>
     </main>
 
