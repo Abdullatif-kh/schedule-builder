@@ -130,6 +130,26 @@ select {
     gap: 0.5rem;
 }
 
+.report {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.report textarea {
+    width: 100%;
+    resize: vertical;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--bg-card);
+    color: var(--text-gray);
+    font-family: monospace;
+    font-size: 0.7rem;
+    direction: ltr;
+    text-align: left;
+}
+
 .btn {
     padding: 0.6rem;
     border: none;
