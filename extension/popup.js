@@ -101,7 +101,7 @@ async function render(state) {
                 : '<span class="todo">•</span> المقررات المطروحة: لم تُسحب بعد',
             registered
                 ? `<span class="tick">✔</span> المقررات المسجلة: ${registered.registeredSections.length} شعبة`
-                : '<span class="todo">•</span> المقررات المسجلة: افتح صفحتها واضغط "ابدأ السحب" مرة أخرى'
+                : '<span class="todo">•</span> المقررات المسجلة: تُجلب تلقائياً بعد المطروحة'
         ].map(line => `<div>${line}</div>`).join('');
     }
 

@@ -72,10 +72,9 @@ repository. (This means the landing page needs to be served over HTTP — openin
 1. Install the unpacked extension from `extension/` (see [extension/README.md](extension/README.md))
 2. Open your university's "offered courses" page
 3. Click the extension icon and press "ابدأ السحب"
-4. The schedule builder opens automatically with your data loaded
-5. Optionally, open the "registered courses" page and press the button again —
-   the extension recognises the page, reads the sections you are already
-   registered in, and fills them into the builder for you
+4. The extension then drives the tab to the "registered courses" page, reads the
+   sections you are already registered in, and fills them into the builder
+5. The schedule builder opens automatically with everything loaded
 
 ### Option B — Console Script
 1. Navigate to your university's course registration system
