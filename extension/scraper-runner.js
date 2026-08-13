@@ -146,7 +146,7 @@
         return courses.slice().sort((a, b) => a.index - b.index);
     }
 
-    async function runScrape(speed) {
+    async function runScrape() {
         if (running) return;
         running = true;
         cancelRequested = false;
@@ -170,15 +170,7 @@
             openLifelinePort();
             installNavigationGuard();
 
-            if (speed === 'turbo') {
-                scraper.enableTurboMode();
-            } else if (speed === 'safe') {
-                scraper.enableSafeMode();
-            } else if (speed === 'gentle') {
-                scraper.setSpeed(2500, 900);
-            } else {
-                scraper.enableFastMode();
-            }
+            scraper.enableTurboMode();
 
             await setState({ status: 'running', done: 0, total: 0, message: 'جارٍ قراءة جدول المواد...' });
 
@@ -189,18 +181,29 @@
                     status: 'error',
                     done: 0,
                     total: 0,
-                    message: 'لم يتم العثور على جدول المواد. افتح صفحة "المقررات المطروحة وفق الخطة" ثم أعد المحاولة. جرّب زر "فحص الصفحة" لمعرفة السبب.'
+                    message: 'لم يتم العثور على جدول المواد. افتح صفحة "المقررات المطروحة وفق الخطة" ثم أعد المحاولة.'
                 });
                 return;
             }
 
-            total = basicCourses.length;
+            // The first parsed row is not a normal section: clicking its
+            // details control makes the portal navigate to the home page,
+            // which kills the scrape. This is the same row the console script
+            // skips ("تجاوز المادة الأولى"). Counting it would also inflate
+            // the total by one and make a completed scrape look failed.
+            const order = basicCourses.map((_, i) => i).slice(1);
 
-            // The first row is the one the console script skips outright: its
-            // details link behaves differently and can navigate away. Visit it
-            // last so a problem there cannot cost us every other section.
-            const order = basicCourses.map((_, i) => i);
-            if (order.length > 1) order.push(order.shift());
+            if (order.length === 0) {
+                await setState({
+                    status: 'error',
+                    done: 0,
+                    total: 0,
+                    message: 'لم يتم العثور على شعب قابلة للسحب في هذه الصفحة'
+                });
+                return;
+            }
+
+            total = order.length;
 
             let lastProgressAt = 0;
 
@@ -253,7 +256,7 @@
             const withoutSessions = collected.filter(c => c.schedule.sessions.length === 0).length;
             let message = `تم سحب ${collected.length} شعبة`;
             if (withoutSessions > 0) {
-                message += ` (${withoutSessions} بلا أوقات — جرّب الوضع الآمن)`;
+                message += ` (${withoutSessions} بلا أوقات — أعد السحب لاستكمالها)`;
             }
 
             await setState({
@@ -284,82 +287,9 @@
         }
     }
 
-    // ---------------------------------------------------------------
-    // Read-only page inspection.
-    // Clicks nothing and changes nothing - it only reports what the scraper
-    // sees, so a page that does not scrape correctly can be diagnosed.
-    // ---------------------------------------------------------------
-    function describeElement(element) {
-        if (!element) return null;
-        return {
-            tag: element.tagName.toLowerCase(),
-            text: (element.textContent || '').trim().slice(0, 40),
-            href: element.getAttribute('href'),
-            onclick: (element.getAttribute('onclick') || '').slice(0, 200),
-            id: element.id || null,
-            class: (element.getAttribute('class') || '').slice(0, 80)
-        };
-    }
-
-    function inspectPage() {
-        const tables = Array.from(document.querySelectorAll('table'));
-
-        let chosenTable = null;
-        let maxRows = 0;
-        tables.forEach(table => {
-            const rows = table.querySelectorAll('tr').length;
-            if (rows > maxRows && rows > 15) {
-                maxRows = rows;
-                chosenTable = table;
-            }
-        });
-
-        const report = {
-            url: location.href,
-            title: document.title,
-            tableCount: tables.length,
-            biggestTables: tables
-                .map(t => ({ rows: t.querySelectorAll('tr').length, id: t.id || null }))
-                .sort((a, b) => b.rows - a.rows)
-                .slice(0, 5),
-            chosenTableRows: maxRows,
-            headerCells: [],
-            sampleRows: []
-        };
-
-        if (!chosenTable) {
-            report.problem = 'لم يُعثر على جدول فيه أكثر من 15 صفاً';
-            return report;
-        }
-
-        const rows = Array.from(chosenTable.querySelectorAll('tr'));
-        report.headerCells = Array.from(rows[0].querySelectorAll('th, td'))
-            .map(cell => cell.textContent.trim().slice(0, 30));
-
-        // First three data rows: what the scraper reads and what it would click
-        report.sampleRows = rows.slice(1, 4).map((row, index) => ({
-            rowIndex: index + 1,
-            cells: Array.from(row.querySelectorAll('td')).map(c => c.textContent.trim().slice(0, 40)),
-            wouldClick: describeElement(row.querySelector('a[onclick], button[onclick]')),
-            clickables: Array.from(row.querySelectorAll('a, button, input[type=button], input[type=submit]'))
-                .slice(0, 6)
-                .map(describeElement)
-        }));
-
-        return report;
-    }
-
-    // Entry points called by the popup through chrome.scripting.executeScript
-    globalThis.__sbStartScrape = function (speed) {
-        runScrape(speed);
+    // Entry point called by the popup through chrome.scripting.executeScript
+    globalThis.__sbStartScrape = function () {
+        runScrape();
         return true;
-    };
-
-    globalThis.__sbInspectPage = function () {
-        try {
-            return inspectPage();
-        } catch (error) {
-            return { error: error.message };
-        }
     };
 })();
