@@ -113,11 +113,14 @@ The schedule generator uses a **backtracking algorithm** with the following appr
    if its section-set fingerprint has not been seen — this is what keeps results
    free of duplicates
 5. **Scoring**: Rank schedules based on:
-   - Registered sections presence
    - Preferred instructors
    - Open vs closed sections
    - Gap minimization between classes
    - Course distribution across days
+
+Sections you are already registered in are kept in the pool even when closed,
+but they carry no scoring bonus — they are scored as open sections. Ranking by
+what you already hold would push worse timetables to the top.
 
 ## Performance
 

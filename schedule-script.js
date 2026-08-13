@@ -9,7 +9,7 @@
 let coursesData = null;                  // Loaded course data from JSON
 let selectedCourses = new Set();          // User-selected courses
 let mandatoryCourses = new Set();         // Mandatory courses (must be in every schedule)
-let registeredSections = new Set();       // Previously registered sections (high priority)
+let registeredSections = new Set();       // Sections already registered in (kept available, never preferred)
 let preferredInstructors = new Set();     // Preferred instructors (normalized names)
 let courseUnits = {};                     // Course units (theoretical + practical combined)
 let instructorIndex = new Map();          // Normalized instructor name -> { display, courses, sectionCount }
@@ -710,6 +710,12 @@ function isValidSchedule(units) {
     return true; // No conflicts found
 }
 
+// Can the student actually take this section? Open sections, plus any section
+// already registered in — a closed section you already hold is still yours.
+function isSectionAvailable(section) {
+    return section.status === 'مفتوحة' || registeredSections.has(section.sectionId);
+}
+
 // Calculate score for a schedule (higher is better).
 // `knownGapMinutes` avoids recomputing gaps when the caller already has them.
 function calculateScheduleScore(units, knownGapMinutes) {
@@ -718,13 +724,11 @@ function calculateScheduleScore(units, knownGapMinutes) {
     units.forEach(unit => {
         // Theoretical section scoring
         if (unit.theoretical) {
-            if (registeredSections.has(unit.theoretical.sectionId)) {
-                score += 100; // Highest priority for registered sections
-            } else if (unit.theoretical.status === 'مفتوحة') {
-                score += 20; // Bonus for open sections
-            } else {
-                score -= 5; // Penalty for closed sections
-            }
+            // A section you are already registered in is available to you no
+            // matter what its status says, so it scores exactly like an open
+            // one. It gets no bonus: ranking schedules by what you happen to
+            // hold today would bury better timetables.
+            score += isSectionAvailable(unit.theoretical) ? 20 : -5;
 
             if (isPreferredInstructor(unit.theoretical.instructor)) {
                 score += 60; // Bonus for a preferred instructor
@@ -733,13 +737,7 @@ function calculateScheduleScore(units, knownGapMinutes) {
 
         // Practical section scoring
         if (unit.practical) {
-            if (registeredSections.has(unit.practical.sectionId)) {
-                score += 50; // High priority for registered practical
-            } else if (unit.practical.status === 'مفتوحة') {
-                score += 10; // Bonus for open practical
-            } else {
-                score -= 3; // Penalty for closed practical
-            }
+            score += isSectionAvailable(unit.practical) ? 10 : -3;
 
             if (isPreferredInstructor(unit.practical.instructor)) {
                 score += 30; // Bonus for a preferred instructor
@@ -929,8 +927,10 @@ function generateAllSchedulesComprehensive() {
         // Filter out closed sections if not including them
         if (!includeClosedSections) {
             units = units.filter(unit => {
-                const theoreticalOpen = !unit.theoretical || unit.theoretical.status === 'مفتوحة' || registeredSections.has(unit.theoretical.sectionId);
-                const practicalOpen = !unit.practical || unit.practical.status === 'مفتوحة' || registeredSections.has(unit.practical.sectionId);
+                // Registered sections stay in the pool even when closed — that
+                // is the only special treatment they get.
+                const theoreticalOpen = !unit.theoretical || isSectionAvailable(unit.theoretical);
+                const practicalOpen = !unit.practical || isSectionAvailable(unit.practical);
                 return theoreticalOpen && practicalOpen;
             });
         }
