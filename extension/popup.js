@@ -17,8 +17,13 @@ const ui = {
     startBtn: document.getElementById('startBtn'),
     cancelBtn: document.getElementById('cancelBtn'),
     openBtn: document.getElementById('openBtn'),
-    clearBtn: document.getElementById('clearBtn')
+    clearBtn: document.getElementById('clearBtn'),
+    version: document.getElementById('version')
 };
+
+// Shown in the header so it is obvious whether a reload actually picked up a
+// newer copy of the extension.
+ui.version.textContent = chrome.runtime.getManifest().version;
 
 let staleTimer = null;
 
