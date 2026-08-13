@@ -61,29 +61,6 @@ body {
     padding: 0.6rem 0.7rem;
 }
 
-.field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-}
-
-.field-label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-select {
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: var(--radius);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: var(--bg-light);
-    color: var(--text-white);
-    font-family: inherit;
-    font-size: 0.85rem;
-}
-
 .progress-bar {
     height: 8px;
     background: var(--bg-light);
@@ -128,26 +105,6 @@ select {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-}
-
-.report {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-}
-
-.report textarea {
-    width: 100%;
-    resize: vertical;
-    padding: 0.5rem;
-    border-radius: var(--radius);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: var(--bg-card);
-    color: var(--text-gray);
-    font-family: monospace;
-    font-size: 0.7rem;
-    direction: ltr;
-    text-align: left;
 }
 
 .btn {

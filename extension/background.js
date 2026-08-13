@@ -60,7 +60,7 @@ chrome.runtime.onConnect.addListener((port) => {
                 status: 'error',
                 done: savedCount,
                 total: state.total || 0,
-                message: `توقف السحب لأن الصفحة انتقلت أو أُعيد تحميلها.${detail} افتح صفحة المقررات المطروحة من جديد وأعد المحاولة بالوضع الآمن.`,
+                message: `توقف السحب لأن الصفحة انتقلت أو أُعيد تحميلها.${detail} افتح صفحة المقررات المطروحة من جديد وأعد المحاولة.`,
                 updatedAt: Date.now(),
                 opened: false
             }

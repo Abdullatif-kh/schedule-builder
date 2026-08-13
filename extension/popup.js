@@ -10,7 +10,6 @@ const STALE_AFTER_MS = 30000;
 
 const ui = {
     hint: document.getElementById('hint'),
-    speed: document.getElementById('speed'),
     progress: document.getElementById('progress'),
     progressFill: document.getElementById('progressFill'),
     progressText: document.getElementById('progressText'),
@@ -18,11 +17,7 @@ const ui = {
     startBtn: document.getElementById('startBtn'),
     cancelBtn: document.getElementById('cancelBtn'),
     openBtn: document.getElementById('openBtn'),
-    inspectBtn: document.getElementById('inspectBtn'),
-    clearBtn: document.getElementById('clearBtn'),
-    report: document.getElementById('report'),
-    reportText: document.getElementById('reportText'),
-    copyReportBtn: document.getElementById('copyReportBtn')
+    clearBtn: document.getElementById('clearBtn')
 };
 
 let staleTimer = null;
@@ -70,9 +65,7 @@ async function render(state) {
 
     ui.startBtn.disabled = isRunning;
     ui.startBtn.textContent = isRunning ? 'جارٍ السحب...' : 'ابدأ السحب';
-    ui.speed.disabled = isRunning;
     ui.cancelBtn.hidden = !isRunning;
-    ui.inspectBtn.hidden = isRunning;
     ui.openBtn.hidden = !data;
     ui.clearBtn.hidden = !data;
     ui.hint.hidden = isRunning;
@@ -123,14 +116,6 @@ async function getActiveTab() {
     return tab;
 }
 
-// Both buttons need the scraper present in the page first.
-async function injectScraper(tabId) {
-    await chrome.scripting.executeScript({
-        target: { tabId },
-        files: ['scraper-core.js', 'scraper-runner.js']
-    });
-}
-
 async function startScrape() {
     const tab = await getActiveTab();
 
@@ -139,18 +124,17 @@ async function startScrape() {
         return;
     }
 
-    const speed = ui.speed.value;
-    ui.report.hidden = true;
-
     try {
         // activeTab grants access to this tab because the user clicked the
         // button, so no permanent permission on the university site is needed.
-        await injectScraper(tab.id);
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['scraper-core.js', 'scraper-runner.js']
+        });
 
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
-            func: (selectedSpeed) => globalThis.__sbStartScrape(selectedSpeed),
-            args: [speed]
+            func: () => globalThis.__sbStartScrape()
         });
 
         await render({ status: 'running', done: 0, total: 0, message: 'جارٍ البدء...', updatedAt: Date.now() });
@@ -160,33 +144,7 @@ async function startScrape() {
     }
 }
 
-async function inspectPage() {
-    const tab = await getActiveTab();
-
-    if (!tab || !tab.id) {
-        showStatus('تعذّر الوصول إلى التبويب الحالي', 'error');
-        return;
-    }
-
-    try {
-        await injectScraper(tab.id);
-
-        const [result] = await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: () => globalThis.__sbInspectPage()
-        });
-
-        ui.reportText.value = JSON.stringify(result.result, null, 2);
-        ui.report.hidden = false;
-        showStatus('تقرير الفحص جاهز — انسخه وأرسله إذا لم يعمل السحب', null);
-    } catch (error) {
-        console.error(error);
-        showStatus(`تعذّر فحص الصفحة: ${error.message}`, 'error');
-    }
-}
-
 ui.startBtn.addEventListener('click', startScrape);
-ui.inspectBtn.addEventListener('click', inspectPage);
 
 ui.cancelBtn.addEventListener('click', async () => {
     showStatus('جارٍ الإيقاف...', null);
@@ -209,16 +167,6 @@ ui.cancelBtn.addEventListener('click', async () => {
 ui.openBtn.addEventListener('click', () => {
     chrome.tabs.create({ url: SB_SITE_URL });
     window.close();
-});
-
-ui.copyReportBtn.addEventListener('click', async () => {
-    try {
-        await navigator.clipboard.writeText(ui.reportText.value);
-        showStatus('تم نسخ التقرير', 'done');
-    } catch (error) {
-        ui.reportText.select();
-        showStatus('حدّد النص وانسخه يدوياً', null);
-    }
 });
 
 ui.clearBtn.addEventListener('click', async () => {
