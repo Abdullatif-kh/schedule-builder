@@ -73,6 +73,9 @@ repository. (This means the landing page needs to be served over HTTP — openin
 2. Open your university's "offered courses" page
 3. Click the extension icon and press "ابدأ السحب"
 4. The schedule builder opens automatically with your data loaded
+5. Optionally, open the "registered courses" page and press the button again —
+   the extension recognises the page, reads the sections you are already
+   registered in, and fills them into the builder for you
 
 ### Option B — Console Script
 1. Navigate to your university's course registration system
@@ -113,11 +116,14 @@ The schedule generator uses a **backtracking algorithm** with the following appr
    if its section-set fingerprint has not been seen — this is what keeps results
    free of duplicates
 5. **Scoring**: Rank schedules based on:
-   - Registered sections presence
    - Preferred instructors
    - Open vs closed sections
    - Gap minimization between classes
    - Course distribution across days
+
+Sections you are already registered in are kept in the pool even when closed,
+but they carry no scoring bonus — they are scored as open sections. Ranking by
+what you already hold would push worse timetables to the top.
 
 ## Performance
 

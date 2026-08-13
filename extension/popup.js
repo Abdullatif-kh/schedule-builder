@@ -17,8 +17,14 @@ const ui = {
     startBtn: document.getElementById('startBtn'),
     cancelBtn: document.getElementById('cancelBtn'),
     openBtn: document.getElementById('openBtn'),
-    clearBtn: document.getElementById('clearBtn')
+    clearBtn: document.getElementById('clearBtn'),
+    collected: document.getElementById('collected'),
+    version: document.getElementById('version')
 };
+
+// Shown in the header so it is obvious whether a reload actually picked up a
+// newer copy of the extension.
+ui.version.textContent = chrome.runtime.getManifest().version;
 
 let staleTimer = null;
 
@@ -32,6 +38,14 @@ async function getStoredData() {
     const stored = await chrome.storage.local.get(SB_DATA_KEY);
     const data = stored[SB_DATA_KEY];
     return (data && Array.isArray(data.courses) && data.courses.length > 0) ? data : null;
+}
+
+async function getRegistered() {
+    const stored = await chrome.storage.local.get(SB_REGISTERED_KEY);
+    const registered = stored[SB_REGISTERED_KEY];
+    return (registered && Array.isArray(registered.registeredSections) && registered.registeredSections.length > 0)
+        ? registered
+        : null;
 }
 
 function isStale(state) {
@@ -62,18 +76,33 @@ async function render(state) {
 
     const isRunning = current.status === 'running';
     const data = await getStoredData();
+    const registered = await getRegistered();
 
     ui.startBtn.disabled = isRunning;
     ui.startBtn.textContent = isRunning ? 'جارٍ السحب...' : 'ابدأ السحب';
     ui.cancelBtn.hidden = !isRunning;
     ui.openBtn.hidden = !data;
-    ui.clearBtn.hidden = !data;
+    ui.clearBtn.hidden = !data && !registered;
     ui.hint.hidden = isRunning;
 
     if (data) {
         ui.openBtn.textContent = data.partial
             ? `افتح الموقع بـ ${data.courses.length} شعبة (غير مكتملة)`
             : 'افتح الموقع بالبيانات';
+    }
+
+    // Second step: the registered sections live on another page, so the
+    // student has to open it and press the button again.
+    ui.collected.hidden = isRunning || (!data && !registered);
+    if (!ui.collected.hidden) {
+        ui.collected.innerHTML = [
+            data
+                ? `<span class="tick">✔</span> المقررات المطروحة: ${data.courses.length} شعبة`
+                : '<span class="todo">•</span> المقررات المطروحة: لم تُسحب بعد',
+            registered
+                ? `<span class="tick">✔</span> المقررات المسجلة: ${registered.registeredSections.length} شعبة`
+                : '<span class="todo">•</span> المقررات المسجلة: افتح صفحتها واضغط "ابدأ السحب" مرة أخرى'
+        ].map(line => `<div>${line}</div>`).join('');
     }
 
     // Re-check for a stall while the popup stays open
@@ -101,7 +130,7 @@ async function render(state) {
     if (current.status === 'error') {
         showStatus(current.message, 'error');
     } else if (current.status === 'done') {
-        showStatus(`${current.message} — البيانات جاهزة للموقع`, 'done');
+        showStatus(current.message, 'done');
     } else if (current.message) {
         showStatus(current.message, null);
     } else if (data) {
@@ -170,7 +199,7 @@ ui.openBtn.addEventListener('click', () => {
 });
 
 ui.clearBtn.addEventListener('click', async () => {
-    await chrome.storage.local.remove(SB_DATA_KEY);
+    await chrome.storage.local.remove([SB_DATA_KEY, SB_REGISTERED_KEY]);
     await resetState('');
     await render(SB_IDLE_STATE);
 });
@@ -179,7 +208,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== 'local') return;
     if (changes[SB_STATE_KEY]) {
         render(changes[SB_STATE_KEY].newValue);
-    } else if (changes[SB_DATA_KEY]) {
+    } else if (changes[SB_DATA_KEY] || changes[SB_REGISTERED_KEY]) {
         chrome.storage.local.get(SB_STATE_KEY).then(stored => render(stored[SB_STATE_KEY]));
     }
 });

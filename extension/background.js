@@ -17,8 +17,30 @@ function setBadge(text, color) {
     }
 }
 
+// Reuse an already-open builder tab so a second scrape does not stack tabs.
+// Re-navigating it also re-runs the bridge, which is how the newly merged data
+// reaches the page.
+// The builder needs the offered courses. Scraping only the registered page
+// (which the student may do first) has nothing to show yet.
+function openSiteIfUsable() {
+    chrome.storage.local.get(SB_DATA_KEY, (stored) => {
+        const data = stored[SB_DATA_KEY];
+        if (data && Array.isArray(data.courses) && data.courses.length > 0) {
+            openSite();
+        }
+    });
+}
+
 function openSite() {
-    chrome.tabs.create({ url: SB_SITE_URL });
+    chrome.tabs.query({ url: SB_SITE_MATCH }, (tabs) => {
+        const existing = tabs && tabs[0];
+
+        if (existing) {
+            chrome.tabs.update(existing.id, { url: SB_SITE_URL, active: true });
+        } else {
+            chrome.tabs.create({ url: SB_SITE_URL });
+        }
+    });
 }
 
 // ---------------------------------------------------------------
@@ -97,7 +119,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
         if (!state.opened) {
             chrome.storage.local.set({
                 [SB_STATE_KEY]: Object.assign({}, state, { opened: true })
-            }, openSite);
+            }, openSiteIfUsable);
         }
         return;
     }
