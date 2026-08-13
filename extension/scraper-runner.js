@@ -387,9 +387,7 @@
         return sections;
     }
 
-    async function runRegisteredScrape() {
-        const sections = extractRegisteredSections();
-
+    async function runRegisteredScrape(sections) {
         await chrome.storage.local.set({
             [REGISTERED_KEY]: {
                 registeredSections: sections.map(s => s.sectionId),
@@ -410,19 +408,68 @@
         console.log(`[مولد الجداول] الشعب المسجلة: ${sections.map(s => s.sectionId).join(', ')}`);
     }
 
-    // Entry point called by the popup through chrome.scripting.executeScript.
-    // Which scrape runs depends on the page the student is standing on.
+    // The portal's own menu entry, used when a direct visit to the registered
+    // view does not render it (JSF keeps a lot of state server-side).
+    function clickRegisteredLink() {
+        const label = 'المقررات المسجلة';
+        const matchesLabel = (el) => (el.textContent || '').trim() === label;
+        const isVisible = (el) => Boolean(el.offsetParent) || el.offsetHeight > 0;
+
+        // Something clickable carrying the label itself
+        const direct = Array.from(document.querySelectorAll('a, button, [onclick]'))
+            .filter(matchesLabel);
+
+        // Or a wrapper around it — the portal marks the menu up as spans and
+        // list items, so the anchor can be inside or outside the labelled node.
+        const wrapped = Array.from(document.querySelectorAll('span, div, li, td'))
+            .filter(matchesLabel)
+            .map(el => el.querySelector('a, button, [onclick]') || el.closest('a, button, [onclick]'))
+            .filter(Boolean);
+
+        const candidates = direct.concat(wrapped);
+        const target = candidates.find(isVisible) || candidates[0];
+
+        if (!target) return false;
+
+        target.click();
+        return true;
+    }
+
+    // ---------------------------------------------------------------
+    // Entry points called through chrome.scripting.executeScript
+    // ---------------------------------------------------------------
+
+    // Started by the popup. Which scrape runs depends on the page the student
+    // is standing on, so the same button works on both.
     globalThis.__sbStartScrape = function () {
         if (running) return true;
 
         // Checked first: the registered page also contains big layout tables
         // that the offered-courses detector would happily mistake for data.
-        if (extractRegisteredSections().length > 0) {
-            runRegisteredScrape();
+        const sections = extractRegisteredSections();
+        if (sections.length > 0) {
+            runRegisteredScrape(sections);
         } else {
             runScrape();
         }
 
         return true;
+    };
+
+    // Driven by the service worker after it navigates the tab. Returns the
+    // number of sections found so the worker knows whether to try again.
+    globalThis.__sbScrapeRegistered = function () {
+        const sections = extractRegisteredSections();
+        if (sections.length > 0) runRegisteredScrape(sections);
+        return sections.length;
+    };
+
+    globalThis.__sbClickRegisteredLink = function () {
+        try {
+            return clickRegisteredLink();
+        } catch (error) {
+            console.warn('[مولد الجداول] تعذّر فتح صفحة المقررات المسجلة:', error);
+            return false;
+        }
     };
 })();
