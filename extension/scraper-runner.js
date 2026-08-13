@@ -21,7 +21,10 @@
 
     const STATE_KEY = 'sb_state';
     const DATA_KEY = 'sb_data';
+    const REGISTERED_KEY = 'sb_registered';
     const CANCEL_KEY = 'sb_cancel';
+
+    const DAY_NAMES = { '1': 'الأحد', '2': 'الاثنين', '3': 'الثلاثاء', '4': 'الأربعاء', '5': 'الخميس' };
 
     // Storage writes are throttled so a 300-section scrape does not spam it
     const PROGRESS_INTERVAL_MS = 400;
@@ -37,7 +40,7 @@
 
     function setState(state) {
         return chrome.storage.local.set({
-            [STATE_KEY]: Object.assign({ updatedAt: Date.now(), opened: false }, state)
+            [STATE_KEY]: Object.assign({ updatedAt: Date.now(), opened: false, phase: 'offered' }, state)
         });
     }
 
@@ -261,6 +264,7 @@
 
             await setState({
                 status: 'done',
+                phase: 'offered',
                 done: collected.length,
                 total: total,
                 message: message
@@ -287,9 +291,138 @@
         }
     }
 
-    // Entry point called by the popup through chrome.scripting.executeScript
+    // ---------------------------------------------------------------
+    // المقررات المسجلة — the student's own registered sections
+    //
+    // A different page and a much simpler one: everything is already in the
+    // table, so nothing is clicked. The day/time/room column holds a nested
+    // table with one row per session.
+    // ---------------------------------------------------------------
+    function parseRegisteredTime(text) {
+        const match = (text || '').match(/(\d{1,2}):(\d{2})\s*(ص|م)\s*-\s*(\d{1,2}):(\d{2})\s*(ص|م)/);
+        if (!match) return { startTime: null, endTime: null };
+
+        const to24 = (hour, period) => {
+            let h = parseInt(hour, 10);
+            if (period === 'م' && h !== 12) h += 12;
+            if (period === 'ص' && h === 12) h = 0;
+            return String(h).padStart(2, '0');
+        };
+
+        return {
+            startTime: `${to24(match[1], match[3])}:${match[2]}`,
+            endTime: `${to24(match[4], match[6])}:${match[5]}`
+        };
+    }
+
+    function parseRegisteredDays(text) {
+        return (text || '').trim().split(/[\s,،]+/)
+            .filter(day => /^[1-5]$/.test(day))
+            .map(Number);
+    }
+
+    function findRegisteredTable() {
+        const byId = document.querySelector('table[id$="studScheduleTable"]');
+        if (byId) return byId;
+
+        // Fall back to the column headings in case the id ever changes
+        const needed = ['رمز المقرر', 'الشعبة', 'المحاضر'];
+        return Array.from(document.querySelectorAll('table')).find(table => {
+            const firstRow = table.querySelector('tr');
+            if (!firstRow) return false;
+            const heads = Array.from(firstRow.querySelectorAll('th, td')).map(c => c.textContent.trim());
+            return needed.every(name => heads.includes(name));
+        }) || null;
+    }
+
+    // Returns [] when this is not the registered-courses page, which is also
+    // how the runner decides which scrape to perform.
+    function extractRegisteredSections() {
+        const table = findRegisteredTable();
+        if (!table) return [];
+
+        // Only the outer rows: the sessions live in a nested table
+        const rows = Array.from(table.querySelectorAll(':scope > tbody > tr, :scope > tr'));
+        const sections = [];
+
+        rows.forEach(row => {
+            const cells = Array.from(row.querySelectorAll(':scope > td'));
+            if (cells.length < 8) return; // header row or a spacer
+
+            const text = (i) => (cells[i] ? cells[i].textContent.replace(/\s+/g, ' ').trim() : '');
+            const sectionId = text(3);
+            if (!/^\d{3,5}$/.test(sectionId)) return;
+
+            const sessions = [];
+            Array.from(cells[6].querySelectorAll('tr')).forEach(sessionRow => {
+                const parts = Array.from(sessionRow.querySelectorAll('td'))
+                    .map(cell => cell.textContent.replace(/\s+/g, ' ').trim());
+                if (parts.length < 2) return;
+
+                const { startTime, endTime } = parseRegisteredTime(parts[1]);
+                if (!startTime) return;
+
+                parseRegisteredDays(parts[0]).forEach(day => {
+                    sessions.push({
+                        day: day,
+                        dayName: DAY_NAMES[String(day)],
+                        startTime: startTime,
+                        endTime: endTime,
+                        room: parts[2] || 'غير محدد'
+                    });
+                });
+            });
+
+            sections.push({
+                code: text(0),
+                name: text(1),
+                sectionId: sectionId,
+                type: text(2) || 'غير محدد',
+                creditHours: text(5) || '0',
+                instructor: text(7) || 'غير محدد',
+                schedule: { sessions: sessions }
+            });
+        });
+
+        return sections;
+    }
+
+    async function runRegisteredScrape() {
+        const sections = extractRegisteredSections();
+
+        await chrome.storage.local.set({
+            [REGISTERED_KEY]: {
+                registeredSections: sections.map(s => s.sectionId),
+                courses: sections,
+                totalCredits: sections.reduce((sum, s) => sum + (parseInt(s.creditHours, 10) || 0), 0),
+                scrapedAt: new Date().toISOString()
+            }
+        });
+
+        await setState({
+            status: 'done',
+            phase: 'registered',
+            done: sections.length,
+            total: sections.length,
+            message: `تم تسجيل ${sections.length} شعبة من مقرراتك المسجلة`
+        });
+
+        console.log(`[مولد الجداول] الشعب المسجلة: ${sections.map(s => s.sectionId).join(', ')}`);
+    }
+
+    // Entry point called by the popup through chrome.scripting.executeScript.
+    // Which scrape runs depends on the page the student is standing on.
     globalThis.__sbStartScrape = function () {
-        runScrape();
+        if (running) return true;
+
+        // Checked first: the registered page also contains big layout tables
+        // that the offered-courses detector would happily mistake for data.
+        if (extractRegisteredSections().length > 0) {
+            runRegisteredScrape();
+        } else {
+            runScrape();
+        }
+
         return true;
     };
 })();

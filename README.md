@@ -73,6 +73,9 @@ repository. (This means the landing page needs to be served over HTTP — openin
 2. Open your university's "offered courses" page
 3. Click the extension icon and press "ابدأ السحب"
 4. The schedule builder opens automatically with your data loaded
+5. Optionally, open the "registered courses" page and press the button again —
+   the extension recognises the page, reads the sections you are already
+   registered in, and fills them into the builder for you
 
 ### Option B — Console Script
 1. Navigate to your university's course registration system

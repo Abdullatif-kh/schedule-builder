@@ -101,6 +101,28 @@ body {
     border-color: rgba(16, 185, 129, 0.4);
 }
 
+.collected {
+    font-size: 0.78rem;
+    color: var(--text-gray);
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius);
+    padding: 0.55rem 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.collected .tick {
+    color: var(--success);
+    font-weight: 700;
+}
+
+.collected .todo {
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
 .actions {
     display: flex;
     flex-direction: column;

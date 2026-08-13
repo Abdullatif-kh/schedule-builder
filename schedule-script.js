@@ -122,6 +122,7 @@ function loadCourseData(storedData) {
         setupCourseSelection();
         setupInstructorSelection();
         setupEventListeners();
+        applyScrapedRegisteredSections(rawData);
 
         showToast('تم تحميل البيانات بنجاح', 'success');
     } catch (error) {
@@ -527,6 +528,19 @@ function deselectAllCourses() {
 // ===============================================
 // REGISTERED SECTIONS MANAGEMENT
 // ===============================================
+
+// The extension can scrape the student's own registered sections from the
+// portal. When it has, fill the field in instead of making them type it.
+function applyScrapedRegisteredSections(rawData) {
+    const scraped = rawData && rawData.registeredSections;
+    if (!Array.isArray(scraped) || scraped.length === 0) return;
+
+    DOM.registeredSectionsInput.value = scraped.join(', ');
+    updateRegisteredSections();
+
+    showToast(`تم جلب ${scraped.length} شعبة مسجلة تلقائياً`, 'info');
+}
+
 function updateRegisteredSections() {
     const input = DOM.registeredSectionsInput.value;
     const sections = input.split(',').map(s => s.trim()).filter(s => s);
